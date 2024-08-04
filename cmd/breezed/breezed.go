@@ -7,13 +7,12 @@ import (
 	"os"
 )
 
-var cfgFile string
+var Version string
 
 var rootCmd = &cobra.Command{
 	Use:   "breezed",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application.`,
+	Short: "breeze daemon worker node",
+	Long:  `This process waits for commands to initiate a job`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Running breezed...")
 	},
@@ -25,7 +24,7 @@ var versionCmd = &cobra.Command{
 	Short: "Prints the version number of breezed",
 	Long:  `This command allows you to print the version number of breezed.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Version:", viper.GetString("VERSION"))
+		fmt.Println("Version:", Version)
 	},
 }
 

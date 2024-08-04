@@ -6,13 +6,15 @@ PKG_DIR = ./...
 GO_BUILD=go build
 GO_CLEAN=go clean
 GO_TEST=go test
+GO_LDFLAGS=-X cmd/breezed.Version=0.0.1
+GO_LDFLAGS=-ldflags "-X main.Version=0.0.1"
 
 # Default target
 all: build
 
 # Build the binary
-build:
-	$(GO_BUILD) -o $(BINARY_NAME) $(SRC_DIR)
+build:	 
+	$(GO_BUILD) $(GO_LDFLAGS) -o $(BINARY_NAME) $(SRC_DIR)
 
 # Run tests
 test:
