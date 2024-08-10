@@ -1,10 +1,13 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"os"
+
+	"github.com/pk-r/breeze-agent/pkg/storage"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"os"
 )
 
 var Version string
@@ -14,7 +17,9 @@ var rootCmd = &cobra.Command{
 	Short: "breeze daemon worker node",
 	Long:  `This process waits for commands to initiate a job`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Running breezed...")
+		s := storage.NewGitStorage("https://github.com/go-git/go-billy")
+		files, _ := s.FetchFiles(context.Background(), "hi")
+		fmt.Println(string(files[0]))
 	},
 }
 
