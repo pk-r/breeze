@@ -8,31 +8,37 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
+	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/go-git/go-git/v5/storage/memory"
 )
 
 type Storage interface {
-	FetchFiles(path string) ([]byte, error)
+	FetchFiles(ctx context.Context) ([][]byte, error)
 }
 
 type GitStorage struct {
-	repoURL   string
+	repoURL string
+
 	cloneFunc func(url string) (*git.Repository, error)
 }
 
 // NewGitStorage creates a new GitStorage with the given repoURL.
-func NewGitStorage(repoURL string) *GitStorage {
+func NewGitStorage(repoURL, username, password string) *GitStorage {
 	return &GitStorage{
 		repoURL: repoURL,
 		cloneFunc: func(url string) (*git.Repository, error) {
 			return git.Clone(memory.NewStorage(), nil, &git.CloneOptions{
 				URL: url,
+				Auth: &http.BasicAuth{
+					Username: username,
+					Password: password,
+				},
 			})
 		},
 	}
 }
 
-func (gs *GitStorage) FetchFiles(ctx context.Context, path string) ([][]byte, error) {
+func (gs *GitStorage) FetchFiles(ctx context.Context) ([][]byte, error) {
 	r, err := gs.cloneFunc(gs.repoURL)
 
 	if err != nil {
@@ -60,8 +66,8 @@ func (gs *GitStorage) FetchFiles(ctx context.Context, path string) ([][]byte, er
 
 	files := [][]byte{}
 	err = tree.Files().ForEach(func(f *object.File) error {
-		if filepath.Ext(f.Name) == ".yml" {
-			fmt.Printf("Reading file: %s\n", f.Name)
+		ext := filepath.Ext(f.Name)
+		if ext == ".yml" || ext == ".yaml"{			
 
 			// Read the file content
 			reader, err := f.Reader()

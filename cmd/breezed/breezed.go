@@ -2,10 +2,14 @@ package main
 
 import (
 	// "context"
+	"context"
 	"fmt"
 	"os"
 
+	"github.com/pk-r/breeze/pkg/action"
 	"github.com/pk-r/breeze/pkg/database"
+	"github.com/pk-r/breeze/pkg/storage"
+
 	// "github.com/pk-r/breeze-agent/internal/storage"
 	// "time"
 	"github.com/spf13/cobra"
@@ -18,19 +22,26 @@ var rootCmd = &cobra.Command{
 	Use:   "breezed",
 	Short: "breeze daemon worker node",
 	Long:  `This process waits for commands to initiate a job`,
-	Run: func(cmd *cobra.Command, args []string) {
-		// s := storage.NewGitStorage("https://github.com/go-git/go-billy")
-		// files, _ := s.FetchFiles(context.Background(), "hi")
-		// fmt.Println(string(files[0]))
-		db, err := database.NewSqliteDB("test.db")
+	Run: func(cmd *cobra.Command, args []string) {		
+		_, err := database.NewSqliteDB("test.db")
 		if err != nil {
 			panic(err)
 		}
 
-		var job database.Job
-		db.First(&job, 1) // find product with integer primary key
-		fmt.Println(job)
+		s := action.Sync{
+			// JobRepository: 
+			Storage: storage.NewGitStorage(
+				"https://github.com/pk-r/testify",
+				"pk-r",
+				"",
+			),
+			// DB: db,
+		}
 
+		err = s.Run(context.Background())
+		if err != nil {
+			panic(err)
+		}
 
 		// job := database.Job{
 		// 	Title:    "Example Job",
