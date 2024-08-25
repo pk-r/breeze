@@ -1,11 +1,13 @@
 package main
 
 import (
-	"context"
+	// "context"
 	"fmt"
 	"os"
 
-	"github.com/pk-r/breeze-agent/pkg/storage"
+	"github.com/pk-r/breeze/pkg/database"
+	// "github.com/pk-r/breeze-agent/internal/storage"
+	// "time"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -17,9 +19,27 @@ var rootCmd = &cobra.Command{
 	Short: "breeze daemon worker node",
 	Long:  `This process waits for commands to initiate a job`,
 	Run: func(cmd *cobra.Command, args []string) {
-		s := storage.NewGitStorage("https://github.com/go-git/go-billy")
-		files, _ := s.FetchFiles(context.Background(), "hi")
-		fmt.Println(string(files[0]))
+		// s := storage.NewGitStorage("https://github.com/go-git/go-billy")
+		// files, _ := s.FetchFiles(context.Background(), "hi")
+		// fmt.Println(string(files[0]))
+		db, err := database.NewSqliteDB("test.db")
+		if err != nil {
+			panic(err)
+		}
+
+		var job database.Job
+		db.First(&job, 1) // find product with integer primary key
+		fmt.Println(job)
+
+
+		// job := database.Job{
+		// 	Title:    "Example Job",
+		// 	Command:  "echo 'Hello, world!'",
+		// 	Hash:     "abc123",
+		// 	LastSync: time.Now(),
+		// }
+
+		// db.Create(&job)
 	},
 }
 
