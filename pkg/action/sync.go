@@ -31,14 +31,15 @@ func (s Sync) Run(ctx context.Context) error {
 		}
 
 		jobs := []database.Job{}
-		errors := []error{}
+		invalidJobsCount := 0
 
 		for title, value := range content {
 			if job, ok := value.(map[string]interface{}); ok {
 				if _, hasScript := job["script"]; hasScript {
 					jobStruct, err := mapToStruct[database.Job](job)
 					if err != nil {
-						errors = append(errors, err)
+						fmt.Println(fmt.Errorf("invalid job: %s, %w", title, err))
+						invalidJobsCount++
 						continue
 					}
 
@@ -48,6 +49,13 @@ func (s Sync) Run(ctx context.Context) error {
 			}
 		}
 
+		if len(jobs) == 0 {
+			return nil
+		}
+
+		if err = s.JobRepository.Sync(jobs); err != nil {
+			return fmt.Errorf("faield to sync jobs to database: %w", err)
+		}
 	}
 
 	return nil

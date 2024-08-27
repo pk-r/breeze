@@ -22,14 +22,14 @@ var rootCmd = &cobra.Command{
 	Use:   "breezed",
 	Short: "breeze daemon worker node",
 	Long:  `This process waits for commands to initiate a job`,
-	Run: func(cmd *cobra.Command, args []string) {		
-		_, err := database.NewSqliteDB("test.db")
+	Run: func(cmd *cobra.Command, args []string) {
+		db, err := database.NewSqliteDB("test.db")
 		if err != nil {
 			panic(err)
 		}
 
 		s := action.Sync{
-			// JobRepository: 
+			JobRepository: database.GormJobRepository{DB: db},
 			Storage: storage.NewGitStorage(
 				"https://github.com/pk-r/testify",
 				"pk-r",
